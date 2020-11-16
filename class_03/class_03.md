@@ -1,8 +1,9 @@
-# 第三课: python环境的安装
+# 第三课: python环境的安装和创建虚拟环境
 
 1. 我们需要安装两个软件: (1)Python解析器Anaconda(Anaconda下载地址:
    https://www.anaconda.com/products/individual 选择对应操作系统即可),
-   (2)Python代码编辑器PyCharm(Pycharm下载地址: https://www.jetbrains.com/pycharm/download/)
+   (2)Python代码编辑器PyCharm(Pycharm下载地址:
+   https://www.jetbrains.com/pycharm/download/)
 
 2. Python是一门解释性的语言，需要解析器去帮把写好的代码运行起来，这就是python的运行环境。
       
