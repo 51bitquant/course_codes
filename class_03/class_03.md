@@ -1,13 +1,15 @@
 # 第三课: python环境的安装和创建虚拟环境
 
-1. 我们需要安装两个软件: (1)Python解析器Anaconda(Anaconda下载地址:
-   https://www.anaconda.com/products/individual 选择对应操作系统即可),
-   (2)Python代码编辑器PyCharm(Pycharm下载地址:
-   https://www.jetbrains.com/pycharm/download/)
+## 安装软件: 
+1. Anaconda, 下载地址: https://www.anaconda.com/products/individual
+   
+2. PyCharm, 下载地址: https://www.jetbrains.com/pycharm/download/
 
-2. Python是一门解释性的语言，需要解析器去帮把写好的代码运行起来，这就是python的运行环境。
+
+##  python解析器和虚拟环境
+1. Python是一门解释性的语言，需要解析器去帮把写好的代码运行起来，这就是python的运行环境。
       
-3. 一个电脑可以运行很多个环境，类似微信的多开的功能，每个解析器的内容完全隔离开。
+2. 一个电脑可以运行很多个环境，类似微信的多开的功能，每个解析器的内容完全隔离开。
 
 
 ## conda创建虚拟环境:
@@ -34,14 +36,13 @@
 
 # Pycharm 配置环境
 PyCharm需要能把代码跑起来，需要配置解析环境。 Window系统设置解析器: 
-```file -->
-setting --> project --> project --> interpreter --> 找你的环境解析器
+```
+file --> setting --> project --> project --> interpreter --> 找你的环境解析器
 
 ```
     
 MacOS系统设置解析器: 
 ```
-Pycharm --> Preferences ---> project --->
-interpreter --> 找到你的环境环境解析器
+Pycharm --> Preferences ---> project ---> interpreter --> 找到你的环境环境解析器
 
 ```
