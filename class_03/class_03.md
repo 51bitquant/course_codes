@@ -37,7 +37,7 @@
 # Pycharm 配置环境
 PyCharm需要能把代码跑起来，需要配置解析环境。 Window系统设置解析器: 
 ```
-file --> setting --> project --> project --> interpreter --> 找你的环境解析器
+file --> setting  --> project --> interpreter --> 找你的环境解析器
 
 ```
     
