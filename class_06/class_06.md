@@ -1,4 +1,4 @@
-# 第六课: VNPY量化交易软件的安装和图形界面的启动
+# 第六课: VNPY量化交易软件的安装, 图形界面的启动和功能介绍
 软件代码地址: **https://github.com/ramoslin02/howtrader.git**
 
 ## step 1 创建一个新的虚拟环境并激活
