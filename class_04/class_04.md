@@ -44,7 +44,6 @@ func(1,c=5)
 5. 如何定位问题的代码出现在哪里? 通过TraceStack进行查找，函数调用栈的问题.
 
 
-
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 ModuleNotFoundError: No module named 'requests'
