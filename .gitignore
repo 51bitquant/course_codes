@@ -128,5 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# pycharm
 .idea
+.DS_Store
 howtrader
