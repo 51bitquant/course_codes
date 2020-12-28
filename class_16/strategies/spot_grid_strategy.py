@@ -47,6 +47,8 @@ class SpotGridStrategy(CtaTemplate):
 
         # 订阅的资产信息. BINANCE.资产名, 或者BINANCES.资产名
         self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCE.USDT", self.process_account_event)
+        self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCE.BNB", self.process_account_event)
+
 
     def on_init(self):
         """
