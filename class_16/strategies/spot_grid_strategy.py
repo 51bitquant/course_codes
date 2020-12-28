@@ -25,8 +25,8 @@ class SpotGridStrategy(CtaTemplate):
     """
     author = "51bitquant"
 
-    grid_step = 2.0  # 网格间隙.
-    trading_size = 0.5  # 每次下单的头寸.
+    grid_step = 2.0  # 网格间隙.  价格*手续费*5  0.001 * 4
+    trading_size = 0.5  # 每次下单的头寸.  # 数量乘以价格>= 10USDT
     max_size = 100.0  # 最大单边的数量.
 
     parameters = ["grid_step", "trading_size", "max_size"]
@@ -48,7 +48,7 @@ class SpotGridStrategy(CtaTemplate):
         # 订阅的资产信息. BINANCE.资产名, 或者BINANCES.资产名
         self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCE.USDT", self.process_account_event)
         self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCE.BNB", self.process_account_event)
-
+        self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCE.ETH", self.process_account_event)
 
     def on_init(self):
         """
@@ -61,6 +61,8 @@ class SpotGridStrategy(CtaTemplate):
         Callback when strategy is started.
         """
         self.write_log("策略启动")
+
+        # 定时器.
         self.cta_engine.event_engine.register(EVENT_TIMER, self.process_timer_event)
 
     def on_stop(self):
@@ -90,7 +92,7 @@ class SpotGridStrategy(CtaTemplate):
                 buy_price = self.tick.bid_price_1 - self.grid_step / 2
                 sell_price = self.tick.ask_price_1 + self.grid_step / 2
 
-                buy_orders_ids = self.buy(buy_price, self.trading_size)
+                buy_orders_ids = self.buy(buy_price, self.trading_size)  # 列表.
                 sell_orders_ids = self.sell(sell_price, self.trading_size)
 
                 self.buy_orders.extend(buy_orders_ids)
@@ -142,7 +144,7 @@ class SpotGridStrategy(CtaTemplate):
                 buy_price = order.price - step * self.grid_step
                 sell_price = order.price + step * self.grid_step
 
-                buy_price = min(self.tick.bid_price_1 * (1 - 0.0001), buy_price)
+                buy_price = min(self.tick.bid_price_1 * (1 - 0.0001), buy_price)  # marker
                 sell_price = max(self.tick.ask_price_1 * (1 + 0.0001), sell_price)
 
                 buy_ids = self.buy(buy_price, self.trading_size)
@@ -181,20 +183,20 @@ class SpotGridStrategy(CtaTemplate):
         :return:
         """
 
-        pos = abs(self.pos)
-
-        if pos < 3 * self.trading_size:
-            return 1
-
-        elif pos < 5 * self.trading_size:
-            return 2
-
-        elif pos < 7 * self.trading_size:
-            return 3
-
-        return 4
-
-
+        return 1
+        # pos = abs(self.pos)  #
+        #
+        # if pos < 3 * self.trading_size:
+        #     return 1
+        #
+        # elif pos < 5 * self.trading_size:
+        #     return 2
+        #
+        # elif pos < 7 * self.trading_size:
+        #     return 3
+        #
+        # return 4
 
         # or you can set it to only one.
         # return 1
+
