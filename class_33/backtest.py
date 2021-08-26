@@ -6,6 +6,7 @@ from strategies.dual_kdj import MyDualKDJ
 
 from howtrader.app.cta_strategy.backtesting import OptimizationSetting
 from strategies.grid_balance_strategy import GridBalanceStrategy
+from strategies.martingle_spot_strategyV2 import MartingleSpotStrategyV2
 
 if __name__ == '__main__':
     engine = BacktestingEngine()
@@ -13,8 +14,9 @@ if __name__ == '__main__':
     engine.set_parameters(
         vt_symbol="btcusdt.BINANCE",  # 现货的数据
         interval=Interval.MINUTE,
-        start=datetime(2020,3,12),
-        end=datetime(2020,12,1),
+        start=datetime(2018,1,11),
+        end=datetime(2020, 12, 1),
+        # end=datetime(2020,12,1),
         rate=7.5/10000,  # 币安手续费千分之1， BNB 万7.5  7.5/10000
         slippage=0,
         size=1,  # 币本位合约 100
@@ -24,7 +26,7 @@ if __name__ == '__main__':
 
     engine.load_data()
 
-    engine.add_strategy(GridBalanceStrategy, {"balance_diff_pct": 0.005})
+    engine.add_strategy(MartingleSpotStrategyV2, {})
     engine.run_backtesting()
 
     engine.calculate_result() # 计算回测的结果
