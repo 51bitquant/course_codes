@@ -601,9 +601,9 @@ class MartingleSpotStrategy(CtaTemplate):
 
     def process_account_event(self, event: Event):
         self.account: AccountData = event.data
-        if self.account:
-            print(f"self.account available: {self.account.available}, balance:{self.account.balance}, frozen: {self.account.frozen}")
-
+        # if self.account:
+        #     print(
+        #         f"self.account available: {self.account.available}, balance:{self.account.balance}, frozen: {self.account.frozen}")
 
     def on_tick(self, tick: TickData):
         """
@@ -613,7 +613,8 @@ class MartingleSpotStrategy(CtaTemplate):
             self.tick = tick
             self.bg.update_tick(tick)
 
-            if len(self.sell_orders) <= 0 and self.current_pos * tick.bid_price_1 >= self.min_trade_value and self.avg_price > 0:
+            if len(
+                    self.sell_orders) <= 0 and self.current_pos * tick.bid_price_1 >= self.min_trade_value and self.avg_price > 0:
                 # 有利润平仓的时候
                 profit_percent = self.tick.bid_price_1 / self.avg_price - 1
                 if profit_percent >= self.exit_profit_pct:
@@ -622,15 +623,15 @@ class MartingleSpotStrategy(CtaTemplate):
                     self.sell_orders.extend(orderids)
 
             # 考虑加仓的条件: 1） 当前有仓位,且仓位值要大于11USDTyi以上，2）加仓的次数小于最大的加仓次数，3）当前的价格比上次入场的价格跌了一定的百分比。
-            dump_percent = self.last_entry_price/tick.bid_price_1 - 1
-            if len(self.buy_orders) <= 0 and self.current_pos * tick.bid_price_1 >= self.min_trade_value and self.current_increase_pos_times <= self.max_increase_pos_times and dump_percent >= self.increase_pos_when_dump_pct:
-                    # ** 表示的是乘方.
-                    increase_pos_value = self.initial_trading_value * self.trading_value_multiplier ** self.current_increase_pos_times
-                    if self.account and self.account.available >= increase_pos_value:
-                        self.cancel_all()
-                        vol = increase_pos_value/ self.tick.ask_price_1
-                        orderids = self.buy(self.tick.ask_price_1, vol)
-                        self.buy_orders.extend(orderids)
+            dump_percent = self.last_entry_price / tick.bid_price_1 - 1
+            if len(
+                    self.buy_orders) <= 0 and self.current_pos * tick.bid_price_1 >= self.min_trade_value and self.current_increase_pos_times <= self.max_increase_pos_times and dump_percent >= self.increase_pos_when_dump_pct:
+                # ** 表示的是乘方.
+                increase_pos_value = self.initial_trading_value * self.trading_value_multiplier ** self.current_increase_pos_times
+                self.cancel_all()
+                vol = increase_pos_value / self.tick.ask_price_1
+                orderids = self.buy(self.tick.ask_price_1, vol)
+                self.buy_orders.extend(orderids)
 
         else:
             self.tick = None
@@ -649,7 +650,7 @@ class MartingleSpotStrategy(CtaTemplate):
             return
 
         current_close = am.close_array[-1]
-        last_close =  am.close_array[-2]
+        last_close = am.close_array[-2]
         boll_up, boll_down = am.boll(self.boll_window, self.boll_dev, array=False)  # 返回最新的布林带值.
 
         # 突破上轨
@@ -663,7 +664,7 @@ class MartingleSpotStrategy(CtaTemplate):
                     self.avg_price = 0
 
                     price = self.tick.ask_price1
-                    vol = self.initial_trading_value/price
+                    vol = self.initial_trading_value / price
                     orderids = self.buy(price, vol)
                     self.buy_orders.extend(orderids)  # 以及已经下单的orderids.
 
@@ -686,7 +687,6 @@ class MartingleSpotStrategy(CtaTemplate):
             elif order.vt_orderid in self.buy_orders:
                 self.buy_orders.remove(order.vt_orderid)
 
-
         self.put_event()  # 更新UI使用.
 
     def on_trade(self, trade: TradeData):
@@ -696,12 +696,13 @@ class MartingleSpotStrategy(CtaTemplate):
         if trade.direction == Direction.LONG:
             total = self.avg_price * self.current_pos + trade.price * trade.volume
             self.current_pos += trade.volume
-            self.avg_price = total/self.current_pos
+            self.avg_price = total / self.current_pos
         elif trade.direction == Direction.SHORT:
             self.current_pos -= trade.volume
 
             # 计算统计下总体的利润.
-            self.total_profit += (trade.price - self.avg_price) * trade.volume - trade.volume * trade.price * 2 * self.trading_fee
+            self.total_profit += (
+                                         trade.price - self.avg_price) * trade.volume - trade.volume * trade.price * 2 * self.trading_fee
 
         self.put_event()
 
