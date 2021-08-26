@@ -686,7 +686,6 @@ class MartingleSpotStrategyV2(CtaTemplate):
             if self.current_increase_pos_times <= self.max_increase_pos_times and dump_down_pct >= self.dump_down_pct and bounce_back_pct >= self.bounce_back_pct:
                 # ** 表示的是乘方.
                 self.cancel_all()  # 清理其他卖单.
-                print("j加仓下单操作...")
                 increase_pos_value = self.initial_trading_value * self.trading_value_multiplier ** self.current_increase_pos_times
                 # if self.account and self.account.available >= increase_pos_value:
                 price = bar.close_price
