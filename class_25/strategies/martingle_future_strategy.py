@@ -655,7 +655,7 @@ class MartingleSpotStrategy(CtaTemplate):
         # 突破上轨
         if last_close <= boll_up < current_close:
             if self.tick and len(self.buy_orders) == 0:
-                if self.current_pos * self.tick.bid_price1 <= self.min_trade_value:  # 每次下单要大于等于10USDT, 为了简单设置11USDT.
+                if self.current_pos * self.tick.bid_price_1 <= self.min_trade_value:  # 每次下单要大于等于10USDT, 为了简单设置11USDT.
                     # 这里没有仓位.
                     self.cancel_all()
                     # 重置当前的数据.
