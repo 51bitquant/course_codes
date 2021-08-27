@@ -574,9 +574,7 @@ class MartingleSpotStrategy(CtaTemplate):
         self.am = MyArrayManager(60)  # 默认是100，设置60
 
         # self.cta_engine.event_engine.register(EVENT_ACCOUNT + 'BINANCE.币名称', self.process_acccount_event)
-        # 现货的资产订阅
         # self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCE.USDT", self.process_account_event)
-        # 合约的资产订阅
         # self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCES.USDT", self.process_account_event)
 
         self.buy_orders = []  # 买单id列表。
