@@ -530,24 +530,31 @@ class MyArrayManager(object):
         return result[-1]
 
 
-class MartingleSpotStrategy(CtaTemplate):
+class MartingleSpotStrategyV2(CtaTemplate):
     """
-        1. 马丁策略.
-        币安邀请链接: https://www.binancezh.pro/cn/futures/ref/51bitquant
-        币安合约邀请码：51bitquant
-        https://github.com/51bitquant/course_codes
+    1. 马丁策略.
+    币安邀请链接: https://www.binancezh.pro/cn/futures/ref/51bitquant
+    币安合约邀请码：51bitquant
+    """
+
+    """
+    1. 开仓条件是 最高价回撤一定比例 4%
+    2. 止盈2%
+    3. 加仓: 入场后, 价格最低下跌超过5%， 最低点反弹上去1%, 那么就可以加仓. 均价止盈2%.
     """
     author = "51bitquant"
 
     # 策略的核心参数.
-    boll_window = 30
-    boll_dev = 2.2
+    donchian_window = 2880  # two days
+    open_pos_when_drawdown_pct = 0.04  # 最高值回撤2%时开仓.
 
-    increase_pos_when_dump_pct = 0.04  # 回撤多少加仓
+    dump_down_pct = 0.04  #
+    bounce_back_pct = 0.01  #
+
     exit_profit_pct = 0.02  # 出场平仓百分比 2%
     initial_trading_value = 1000  # 首次开仓价值 1000USDT.
-    trading_value_multiplier = 1.3  # 加仓的比例. 1000 1300 1300 * 1.3
-    max_increase_pos_times = 10.0  # 最大的加仓次数
+    trading_value_multiplier = 1.3  # 加仓的比例.
+    max_increase_pos_times = 7  # 最大的加仓次数
     trading_fee = 0.00075
 
     # 变量
@@ -556,13 +563,19 @@ class MartingleSpotStrategy(CtaTemplate):
     current_pos = 0.0  # 当前的持仓的数量.
     current_increase_pos_times = 0  # 当前的加仓的次数.
 
+    upband = 0.0
+    downband = 0.0
+    entry_lowest = 0.0  # 进场之后的最低价.
+
     # 统计总的利润.
     total_profit = 0
 
-    parameters = ["boll_window", "boll_dev", "increase_pos_when_dump_pct", "exit_profit_pct", "initial_trading_value",
+    parameters = ["donchian_window", "open_pos_when_drawdown_pct", "dump_down_pct", "bounce_back_pct",
+                  "exit_profit_pct", "initial_trading_value",
                   "trading_value_multiplier", "max_increase_pos_times", "trading_fee"]
 
-    variables = ["avg_price", "last_entry_price", "current_pos", "current_increase_pos_times", "total_profit"]
+    variables = ["avg_price", "last_entry_price", "current_pos", "current_increase_pos_times",
+                 "upband", "downband", "entry_lowest", "total_profit"]
 
     def __init__(self, cta_engine: CtaEngine, strategy_name, vt_symbol, setting):
         """"""
@@ -572,16 +585,10 @@ class MartingleSpotStrategy(CtaTemplate):
         self.tick: Optional[TickData, None] = None
         self.contract: Optional[ContractData, None] = None
         self.account: Optional[AccountData, None] = None
-
-        self.bg = BarGenerator(self.on_bar, 15, self.on_15min_bar, Interval.MINUTE)  # 15分钟的数据.
-        self.am = MyArrayManager(60)  # 默认是100，设置60
-            # ArrayManager
+        self.am = MyArrayManager(3000)  # 默认是100，设置3000
 
         # self.cta_engine.event_engine.register(EVENT_ACCOUNT + 'BINANCE.币名称', self.process_acccount_event)
-        # 现货的资产订阅
         # self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCE.USDT", self.process_account_event)
-        # # 合约的资产订阅
-        # self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCES.USDT", self.process_account_event)
 
         self.buy_orders = []  # 买单id列表。
         self.sell_orders = []  # 卖单id列表。
@@ -592,7 +599,7 @@ class MartingleSpotStrategy(CtaTemplate):
         Callback when strategy is inited.
         """
         self.write_log("策略初始化")
-        self.load_bar(2)  # 加载两天的数据.
+        self.load_bar(3)  # 加载3天的数据.
 
     def on_start(self):
         """
@@ -606,73 +613,82 @@ class MartingleSpotStrategy(CtaTemplate):
         """
         self.write_log("策略停止")
 
-    def process_account_event(self, event: Event):
-        self.account: AccountData = event.data
-        # if self.account:
-        #     print(
-        #         f"self.account available: {self.account.available}, balance:{self.account.balance}, frozen: {self.account.frozen}")
+    # def process_account_event(self, event: Event):
+    #     self.account: AccountData = event.data
+    #     if self.account:
+    #         print(
+    #             f"self.account: available{self.account.available}, balance:{self.account.balance}, frozen: {self.account.frozen}")
 
     def on_tick(self, tick: TickData):
         """
         Callback of new tick data update.
         """
-        if tick and tick.bid_price_1 > 0 and tick.ask_price_1 > 0:
-            self.tick = tick
-            self.bg.update_tick(tick)
+        # if tick.bid_price_1 > 0 and tick.ask_price_1 > 0:
+        #     self.tick = tick
+        # else:
+        #     self.tick = None
 
     def on_bar(self, bar: BarData):
         """
         Callback of new bar data update.
         """
-
-        if self.current_pos * bar.close_price >= self.min_notional:
-
-            if len(self.sell_orders) <= 0 and self.avg_price > 0:
-                # 有利润平仓的时候
-                profit_percent = bar.close_price / self.avg_price - 1
-                if profit_percent >= self.exit_profit_pct:
-                    self.cancel_all()
-                    orderids = self.sell(bar.close_price, abs(self.current_pos))
-                    self.sell_orders.extend(orderids)
-
-            # 考虑加仓的条件: 1） 当前有仓位,且仓位值要大于11USDTyi以上，2）加仓的次数小于最大的加仓次数，3）当前的价格比上次入场的价格跌了一定的百分比。
-            dump_percent = self.last_entry_price / bar.close_price - 1
-            if len(
-                    self.buy_orders) <= 0 and self.current_increase_pos_times <= self.max_increase_pos_times and dump_percent >= self.increase_pos_when_dump_pct:
-                # ** 表示的是乘方.
-                self.cancel_all()
-                increase_pos_value = self.initial_trading_value * self.trading_value_multiplier ** self.current_increase_pos_times
-                price = bar.close_price
-                vol = increase_pos_value / price
-                orderids = self.buy(price, vol)
-                self.buy_orders.extend(orderids)
-
-        self.bg.update_bar(bar)
-
-    def on_15min_bar(self, bar: BarData):
-
         am = self.am
         am.update_bar(bar)
         if not am.inited:
             return
 
         current_close = am.close_array[-1]
-        last_close = am.close_array[-2]
-        boll_up, boll_down = am.boll(self.boll_window, self.boll_dev, array=False)  # 返回最新的布林带值.
+        current_low = am.low_array[-1]
 
-        # 突破上轨
-        if last_close <= boll_up < current_close:
-            if len(self.buy_orders) == 0 and self.current_pos * bar.close_price < self.min_notional:  # 每次下单要大于等于10USDT, 为了简单设置11USDT.
+        self.upband, self.downband = am.donchian(self.donchian_window, array=False)  # 返回最新的布林带值.
+
+        dump_pct = self.upband / current_low - 1
+
+        if self.entry_lowest > 0:
+            self.entry_lowest = min(self.entry_lowest, bar.low_price)
+
+        # 回调一定比例的时候.
+        if self.current_pos * current_close < self.min_notional:
+            # 每次下单要大于等于10USDT, 为了简单设置11USDT.
+            if dump_pct >= self.open_pos_when_drawdown_pct and len(self.buy_orders) == 0:
                 # 这里没有仓位.
-                self.cancel_all()
                 # 重置当前的数据.
+                self.cancel_all()
                 self.current_increase_pos_times = 0
                 self.avg_price = 0
+                self.entry_lowest = 0
 
-                price = bar.close_price
+                price = current_close
                 vol = self.initial_trading_value / price
                 orderids = self.buy(price, vol)
                 self.buy_orders.extend(orderids)  # 以及已经下单的orderids.
+        else:
+
+            if len(self.sell_orders) <= 0 and self.avg_price > 0:
+                # 有利润平仓的时候
+                # 清理掉其他买单.
+
+                profit_percent = bar.close_price / self.avg_price - 1
+                if profit_percent >= self.exit_profit_pct:
+                    self.cancel_all()
+                    orderids = self.short(bar.close_price, abs(self.current_pos))
+                    self.sell_orders.extend(orderids)
+
+            if self.entry_lowest > 0 and len(self.buy_orders) <= 0:
+                # 考虑加仓的条件: 1） 当前有仓位,且仓位值要大于11USDTyi以上，2）加仓的次数小于最大的加仓次数，3）当前的价格比上次入场的价格跌了一定的百分比。
+
+                dump_down_pct = self.last_entry_price / self.entry_lowest - 1
+                bounce_back_pct = bar.close_price / self.entry_lowest - 1
+
+                if self.current_increase_pos_times <= self.max_increase_pos_times and dump_down_pct >= self.dump_down_pct and bounce_back_pct >= self.bounce_back_pct:
+                    # ** 表示的是乘方.
+                    self.cancel_all()  # 清理其他卖单.
+                    increase_pos_value = self.initial_trading_value * self.trading_value_multiplier ** self.current_increase_pos_times
+                    # if self.account and self.account.available >= increase_pos_value:
+                    price = bar.close_price
+                    vol = increase_pos_value / price
+                    orderids = self.buy(price, vol)
+                    self.buy_orders.extend(orderids)
 
         self.put_event()
 
@@ -683,8 +699,10 @@ class MartingleSpotStrategy(CtaTemplate):
         if order.status == Status.ALLTRADED:
             if order.direction == Direction.LONG:
                 # 买单成交.
+
                 self.current_increase_pos_times += 1
                 self.last_entry_price = order.price  # 记录上一次成绩的价格.
+                self.entry_lowest = order.price
 
         if not order.is_active():
             if order.vt_orderid in self.sell_orders:

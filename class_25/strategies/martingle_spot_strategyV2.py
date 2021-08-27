@@ -532,17 +532,15 @@ class MyArrayManager(object):
 
 class MartingleSpotStrategyV2(CtaTemplate):
     """
-    1. 现货马丁策略
-    2. 上涨回撤一定幅度后开仓
-    3. 加仓是在下跌一定幅度后，回调就加仓.
-
+    1. 马丁策略.
+    币安邀请链接: https://www.binancezh.pro/cn/futures/ref/51bitquant
+    币安合约邀请码：51bitquant
     """
 
     """
     1. 开仓条件是 最高价回撤一定比例 4%
     2. 止盈2%
-    3. 加仓: 入场后, 价格最低下跌超过5%， 最低点反弹上去2%, 那么就可以加仓. 均价止盈2%.
-    4. 
+    3. 加仓: 入场后, 价格最低下跌超过5%， 最低点反弹上去1%, 那么就可以加仓. 均价止盈2%.
     """
     author = "51bitquant"
 
@@ -554,7 +552,7 @@ class MartingleSpotStrategyV2(CtaTemplate):
     bounce_back_pct = 0.01  #
 
     exit_profit_pct = 0.02  # 出场平仓百分比 2%
-    initial_trading_value = 500  # 首次开仓价值 100USDT.
+    initial_trading_value = 1000  # 首次开仓价值 1000USDT.
     trading_value_multiplier = 1.3  # 加仓的比例.
     max_increase_pos_times = 7  # 最大的加仓次数
     trading_fee = 0.00075

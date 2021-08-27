@@ -532,7 +532,10 @@ class MyArrayManager(object):
 
 class MartingleSpotStrategy(CtaTemplate):
     """
-        1. 现货马丁策略.
+        1. 马丁策略.
+        币安邀请链接: https://www.binancezh.pro/cn/futures/ref/51bitquant
+        币安合约邀请码：51bitquant
+        https://github.com/51bitquant/course_codes
     """
     author = "51bitquant"
 
@@ -542,8 +545,8 @@ class MartingleSpotStrategy(CtaTemplate):
 
     increase_pos_when_dump_pct = 0.04  # 回撤多少加仓
     exit_profit_pct = 0.02  # 出场平仓百分比 2%
-    initial_trading_value = 1000  # 首次开仓价值 100USDT.
-    trading_value_multiplier = 1.3  # 加仓的比例.
+    initial_trading_value = 1000  # 首次开仓价值 1000USDT.
+    trading_value_multiplier = 1.3  # 加仓的比例. 1000 1300 1300 * 1.3
     max_increase_pos_times = 10.0  # 最大的加仓次数
     trading_fee = 0.00075
 
@@ -572,9 +575,12 @@ class MartingleSpotStrategy(CtaTemplate):
 
         self.bg = BarGenerator(self.on_bar, 15, self.on_15min_bar, Interval.MINUTE)  # 15分钟的数据.
         self.am = MyArrayManager(60)  # 默认是100，设置60
+            # ArrayManager
 
         # self.cta_engine.event_engine.register(EVENT_ACCOUNT + 'BINANCE.币名称', self.process_acccount_event)
+        # 现货的资产订阅
         # self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCE.USDT", self.process_account_event)
+        # # 合约的资产订阅
         # self.cta_engine.event_engine.register(EVENT_ACCOUNT + "BINANCES.USDT", self.process_account_event)
 
         self.buy_orders = []  # 买单id列表。
@@ -619,7 +625,7 @@ class MartingleSpotStrategy(CtaTemplate):
         Callback of new bar data update.
         """
 
-        if self.current_pos * bar.close_price >= self.min_notional >= self.min_notional:
+        if self.current_pos * bar.close_price >= self.min_notional:
 
             if len(self.sell_orders) <= 0 and self.avg_price > 0:
                 # 有利润平仓的时候
@@ -656,8 +662,7 @@ class MartingleSpotStrategy(CtaTemplate):
 
         # 突破上轨
         if last_close <= boll_up < current_close:
-            if len(
-                    self.buy_orders) == 0 and self.current_pos * bar.close_price <= self.min_notional:  # 每次下单要大于等于10USDT, 为了简单设置11USDT.
+            if len(self.buy_orders) == 0 and self.current_pos * bar.close_price < self.min_notional:  # 每次下单要大于等于10USDT, 为了简单设置11USDT.
                 # 这里没有仓位.
                 self.cancel_all()
                 # 重置当前的数据.

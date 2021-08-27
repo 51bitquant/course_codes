@@ -530,7 +530,7 @@ class MyArrayManager(object):
         return result[-1]
 
 
-class MartingleSpotStrategy(CtaTemplate):
+class MartingleFutureStrategy(CtaTemplate):
     """
         1. 马丁策略.
         币安邀请链接: https://www.binancezh.pro/cn/futures/ref/51bitquant
@@ -632,7 +632,7 @@ class MartingleSpotStrategy(CtaTemplate):
                 profit_percent = bar.close_price / self.avg_price - 1
                 if profit_percent >= self.exit_profit_pct:
                     self.cancel_all()
-                    orderids = self.sell(bar.close_price, abs(self.current_pos))
+                    orderids = self.short(bar.close_price, abs(self.current_pos))
                     self.sell_orders.extend(orderids)
 
             # 考虑加仓的条件: 1） 当前有仓位,且仓位值要大于11USDTyi以上，2）加仓的次数小于最大的加仓次数，3）当前的价格比上次入场的价格跌了一定的百分比。

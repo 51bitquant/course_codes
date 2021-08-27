@@ -532,17 +532,15 @@ class MyArrayManager(object):
 
 class MartingleSpotStrategyV2(CtaTemplate):
     """
-    1. 现货马丁策略
-    2. 上涨回撤一定幅度后开仓
-    3. 加仓是在下跌一定幅度后，回调就加仓.
-
+    1. 马丁策略.
+    币安邀请链接: https://www.binancezh.pro/cn/futures/ref/51bitquant
+    币安合约邀请码：51bitquant
     """
 
     """
     1. 开仓条件是 最高价回撤一定比例 4%
     2. 止盈2%
-    3. 加仓: 入场后, 价格最低下跌超过5%， 最低点反弹上去2%, 那么就可以加仓. 均价止盈2%.
-    4. 
+    3. 加仓: 入场后, 价格最低下跌超过5%， 最低点反弹上去1%, 那么就可以加仓. 均价止盈2%.
     """
     author = "51bitquant"
 
@@ -554,7 +552,7 @@ class MartingleSpotStrategyV2(CtaTemplate):
     bounce_back_pct = 0.01  #
 
     exit_profit_pct = 0.02  # 出场平仓百分比 2%
-    initial_trading_value = 500  # 首次开仓价值 100USDT.
+    initial_trading_value = 1000  # 首次开仓价值 1000USDT.
     trading_value_multiplier = 1.3  # 加仓的比例.
     max_increase_pos_times = 7  # 最大的加仓次数
     trading_fee = 0.00075
@@ -563,7 +561,7 @@ class MartingleSpotStrategyV2(CtaTemplate):
     avg_price = 0.0  # 当前持仓的平均价格.
     last_entry_price = 0.0  # 上一次入场的价格.
     current_pos = 0.0  # 当前的持仓的数量.
-    current_increase_pos_times = 0 # 当前的加仓的次数.
+    current_increase_pos_times = 0  # 当前的加仓的次数.
 
     upband = 0.0
     downband = 0.0
@@ -594,7 +592,7 @@ class MartingleSpotStrategyV2(CtaTemplate):
 
         self.buy_orders = []  # 买单id列表。
         self.sell_orders = []  # 卖单id列表。
-        self.min_trade_value = 11  # 最小的交易金额.
+        self.min_notional = 11  # 最小的交易金额.
 
     def on_init(self):
         """
@@ -650,49 +648,47 @@ class MartingleSpotStrategyV2(CtaTemplate):
             self.entry_lowest = min(self.entry_lowest, bar.low_price)
 
         # 回调一定比例的时候.
-        if dump_pct >= self.open_pos_when_drawdown_pct:
-            if len(self.buy_orders) == 0:
-                if self.current_pos * current_close <= self.min_trade_value:  # 每次下单要大于等于10USDT, 为了简单设置11USDT.
-                    # 这里没有仓位.
-                    # 重置当前的数据.
-                    self.cancel_all()
-
-                    self.current_increase_pos_times = 0
-                    self.avg_price = 0
-                    self.entry_lowest = 0
-
-                    price = current_close
-                    vol = self.initial_trading_value / price
-                    orderids = self.buy(price, vol)
-                    self.buy_orders.extend(orderids)  # 以及已经下单的orderids.
-
-        if len(self.sell_orders) <= 0 and self.current_pos * bar.close_price >= self.min_trade_value and self.avg_price > 0:
-            # 有利润平仓的时候
-              # 清理掉其他买单.
-
-            profit_percent = bar.close_price / self.avg_price - 1
-            if profit_percent >= self.exit_profit_pct:
+        if self.current_pos * current_close < self.min_notional:
+            # 每次下单要大于等于10USDT, 为了简单设置11USDT.
+            if dump_pct >= self.open_pos_when_drawdown_pct and len(self.buy_orders) == 0:
+                # 这里没有仓位.
+                # 重置当前的数据.
                 self.cancel_all()
-                orderids = self.sell(bar.close_price, abs(self.current_pos))
-                self.sell_orders.extend(orderids)
+                self.current_increase_pos_times = 0
+                self.avg_price = 0
+                self.entry_lowest = 0
 
-        if self.entry_lowest > 0 and len(
-                self.buy_orders) <= 0 and self.current_pos * bar.close_price >= self.min_trade_value:
-            # 考虑加仓的条件: 1） 当前有仓位,且仓位值要大于11USDTyi以上，2）加仓的次数小于最大的加仓次数，3）当前的价格比上次入场的价格跌了一定的百分比。
-
-            dump_down_pct = self.last_entry_price / self.entry_lowest - 1
-            bounce_back_pct = bar.close_price / self.entry_lowest - 1
-
-            if self.current_increase_pos_times <= self.max_increase_pos_times and dump_down_pct >= self.dump_down_pct and bounce_back_pct >= self.bounce_back_pct:
-                # ** 表示的是乘方.
-                self.cancel_all()  # 清理其他卖单.
-                print("j加仓下单操作...")
-                increase_pos_value = self.initial_trading_value * self.trading_value_multiplier ** self.current_increase_pos_times
-                # if self.account and self.account.available >= increase_pos_value:
-                price = bar.close_price
-                vol = increase_pos_value / price
+                price = current_close
+                vol = self.initial_trading_value / price
                 orderids = self.buy(price, vol)
-                self.buy_orders.extend(orderids)
+                self.buy_orders.extend(orderids)  # 以及已经下单的orderids.
+        else:
+
+            if len(self.sell_orders) <= 0 and self.avg_price > 0:
+                # 有利润平仓的时候
+                # 清理掉其他买单.
+
+                profit_percent = bar.close_price / self.avg_price - 1
+                if profit_percent >= self.exit_profit_pct:
+                    self.cancel_all()
+                    orderids = self.sell(bar.close_price, abs(self.current_pos))
+                    self.sell_orders.extend(orderids)
+
+            if self.entry_lowest > 0 and len(self.buy_orders) <= 0:
+                # 考虑加仓的条件: 1） 当前有仓位,且仓位值要大于11USDTyi以上，2）加仓的次数小于最大的加仓次数，3）当前的价格比上次入场的价格跌了一定的百分比。
+
+                dump_down_pct = self.last_entry_price / self.entry_lowest - 1
+                bounce_back_pct = bar.close_price / self.entry_lowest - 1
+
+                if self.current_increase_pos_times <= self.max_increase_pos_times and dump_down_pct >= self.dump_down_pct and bounce_back_pct >= self.bounce_back_pct:
+                    # ** 表示的是乘方.
+                    self.cancel_all()  # 清理其他卖单.
+                    increase_pos_value = self.initial_trading_value * self.trading_value_multiplier ** self.current_increase_pos_times
+                    # if self.account and self.account.available >= increase_pos_value:
+                    price = bar.close_price
+                    vol = increase_pos_value / price
+                    orderids = self.buy(price, vol)
+                    self.buy_orders.extend(orderids)
 
         self.put_event()
 
