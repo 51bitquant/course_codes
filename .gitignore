@@ -134,3 +134,4 @@ dmypy.json
 howtrader
 mystudies
 collect_data
+*.out
