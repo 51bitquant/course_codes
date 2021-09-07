@@ -543,15 +543,15 @@ class MartingleSpotStrategyV3(CtaTemplate):
     3. 如果入场后，没有利润，价格继续下跌。那么入场价格下跌5%后，采用马丁策略加仓。
 
     """
-
     author = "51bitquant"
 
     # 策略的核心参数.
-    initial_trading_value = 1000  # 首次开仓价值 1000USDT.
-    trading_value_multiplier = 1.5  # 加仓的比例.
+    initial_trading_value = 200  # 首次开仓价值 1000USDT.
+    trading_value_multiplier = 2  # 加仓的比例.
     max_increase_pos_count = 5  # 最大的加仓次数
 
-    pump_pct = 0.026
+    hour_pump_pct = 0.026  # 小时的上涨百分比
+    four_hour_pump_pct = 0.046  # 四小时的上涨百分比.
     high_close_change_pct = 0.03  # 最高价/收盘价 -1, 防止上引线过长.
     increase_pos_when_dump_pct = 0.05  # 价格下跌 5%就继续加仓.
     exit_profit_pct = 0.01  # 出场平仓百分比 1%
@@ -567,7 +567,8 @@ class MartingleSpotStrategyV3(CtaTemplate):
     total_profit = 0  # 统计总的利润.
 
     parameters = ["initial_trading_value", "trading_value_multiplier", "max_increase_pos_count",
-                  "pump_pct", "high_close_change_pct", "increase_pos_when_dump_pct", "exit_profit_pct",
+                  "hour_pump_pct", "four_hour_pump_pct", "high_close_change_pct", "increase_pos_when_dump_pct",
+                  "exit_profit_pct",
                   "exit_pull_back_pct", "trading_fee"]
 
     variables = ["avg_price", "last_entry_price", "entry_highest_price", "current_pos", "current_increase_pos_count",
@@ -653,8 +654,8 @@ class MartingleSpotStrategyV3(CtaTemplate):
                 if self.current_increase_pos_count <= self.max_increase_pos_count and dump_down_pct >= self.increase_pos_when_dump_pct:
                     # ** 表示的是乘方.
                     self.cancel_all()  # 清理其他卖单.
+
                     increase_pos_value = self.initial_trading_value * self.trading_value_multiplier ** self.current_increase_pos_count
-                    # if self.account and self.account.available >= increase_pos_value:
                     price = bar.close_price
                     vol = increase_pos_value / price
                     orderids = self.buy(price, vol)
@@ -673,7 +674,7 @@ class MartingleSpotStrategyV3(CtaTemplate):
         # 回调一定比例的时候.
         if self.current_pos * bar.close_price < self.min_notional:
             # 每次下单要大于等于10USDT, 为了简单设置11USDT.
-            if close_change_pct >= self.pump_pct and high_change_pct < self.high_close_change_pct and len(
+            if close_change_pct >= self.hour_pump_pct and high_change_pct < self.high_close_change_pct and len(
                     self.buy_orders) == 0:
                 # 这里没有仓位.
                 # 重置当前的数据.
@@ -694,7 +695,7 @@ class MartingleSpotStrategyV3(CtaTemplate):
         # 回调一定比例的时候.
         if self.current_pos * bar.close_price < self.min_notional:
             # 每次下单要大于等于10USDT, 为了简单设置11USDT.
-            if close_change_pct >= self.pump_pct and high_change_pct < self.high_close_change_pct and len(
+            if close_change_pct >= self.four_hour_pump_pct and high_change_pct < self.high_close_change_pct and len(
                     self.buy_orders) == 0:
                 # 这里没有仓位.
                 # 重置当前的数据.

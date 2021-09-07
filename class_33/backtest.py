@@ -8,7 +8,7 @@ from howtrader.app.cta_strategy.backtesting import OptimizationSetting
 from strategies.grid_balance_strategy import GridBalanceStrategy
 from strategies.martingle_spot_strategyV2 import MartingleSpotStrategyV2
 from strategies.martingle_spot_strategy import MartingleSpotStrategy
-
+from strategies.martingle_spot_strategyV3 import MartingleSpotStrategyV3
 
 if __name__ == '__main__':
     engine = BacktestingEngine()
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     engine.load_data()
 
-    engine.add_strategy(MartingleSpotStrategy, {})
+    engine.add_strategy(MartingleSpotStrategyV3, {})
     engine.run_backtesting()
 
     engine.calculate_result() # 计算回测的结果
