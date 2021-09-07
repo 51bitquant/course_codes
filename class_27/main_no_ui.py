@@ -16,6 +16,7 @@ SETTINGS["log.active"] = True
 SETTINGS["log.level"] = INFO
 SETTINGS["log.console"] = True
 
+# 合约的api配置
 binances_setting = {
     "key": "",
     "secret": "",
@@ -26,14 +27,13 @@ binances_setting = {
     "代理端口": 0,
 }
 
+# 现货的api
 binance_setting = {
     "key": "",
     "secret": "",
-    "会话数": 3,
-    "服务器": "REAL",
-    "合约模式": "正向",
-    "代理地址": "",
-    "代理端口": 0,
+    "session_number": 3,
+    "proxy_host": "",
+    "proxy_port": 0,
 }
 
 
@@ -46,6 +46,7 @@ def run():
     event_engine = EventEngine()
     main_engine = MainEngine(event_engine)
     main_engine.add_gateway(BinancesGateway)
+    main_engine.add_gateway(BinanceGateway)
     # cta_engine = main_engine.add_app(CtaStrategyApp)
     cta_engine: CtaEngine = main_engine.add_app(CtaStrategyApp)
     main_engine.write_log("主引擎创建成功")
@@ -55,8 +56,8 @@ def run():
     event_engine.register(EVENT_CTA_LOG, log_engine.process_log_event)
     main_engine.write_log("注册日志事件监听")
 
-    main_engine.connect(binances_setting, "BINANCES")
-    main_engine.connect(binances_setting, "BINANCE")
+    # main_engine.connect(binances_setting, "BINANCES")  # 连接合约的
+    main_engine.connect(binance_setting, "BINANCE")  # 连接现货的
     main_engine.write_log("连接接口成功")
 
     sleep(10)
