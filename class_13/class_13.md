@@ -29,7 +29,7 @@ https://www.ucloud.cn/site/global.html?invitation_code=C1x2EA81CD79B8C#dongjing]
 4. 安装git工具
 
 ## 安装howtrader
-> pip install git+https://github.com/ramoslin02/howtrader
+> pip install git+https://github.com/51bitquant/howtrader.git
 
 ## 上传文件到服务器
 1. windowd的可以自己百度学习下，如何把文件上传到window服务器

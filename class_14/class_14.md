@@ -16,9 +16,9 @@
 2. 下载地址: https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib
 
 3. 搜索ta-lib找到ta-lib的包: 
-TA_Lib‑0.4.19‑cp37‑cp37m‑win_amd64.whl
+TA_Lib‑0.4.24‑cp39‑cp39‑win_amd64.whl
 
-记得下载自己对应的python版本，cp37就是python3.7版本， amd64就是64位的意思。
+记得下载自己对应的python版本，cp39就是python3.9版本， amd64就是64位的意思。
 
 4. 通过pip命令安装 
-> pip install TA_Lib‑0.4.19‑cp37‑cp37m‑win_amd64.whl
+> pip install TA_Lib‑0.4.24‑cp39‑cp39‑win_amd64.whl
