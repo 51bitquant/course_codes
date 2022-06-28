@@ -1,5 +1,8 @@
 #VNPY 数字货币量化交易从零到实盘交易的课程代码和资料
 
+## requirements
+需要安装howtrader, 具体安装请查看课程的相应章节。
+
 ## 课程的代码和资料
 class_01 就是第一课, class_02 就是第二课的代码和资料,以此类推。
 
@@ -18,6 +21,4 @@ class_01 就是第一课, class_02 就是第二课的代码和资料,以此类�
 
 ## 赞赏
 
-BTC地址: 3MvBTjWLYH6MGvcGjkZGhDSpMukYsZSHrJ 
-
-ETH地址: 0x386AD57a044032E2777A93CeC7E72859Ffa35569
+ETH地址: 0x0174C7b955114b3108Df18AD9b63eD5F3A02623b
