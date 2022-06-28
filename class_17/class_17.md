@@ -38,20 +38,21 @@
 
 
 ```python
+from decimal import Decimal
+from howtrader.trader.object import  OrderData, Status, Direction
 
 class GridPositionCalculator(object):
     """
     用来计算网格头寸的平均价格
     Use for calculating the grid position's average price.
-
     :param grid_step: 网格间隙.
     """
 
-    def __init__(self, grid_step=1.0):
-        self.pos = 0
-        self.avg_price = 0
-        self.profit = 0
-        self.grid_step = grid_step
+    def __init__(self, grid_step: float = 1.0):
+        self.pos: Decimal = Decimal("0")
+        self.avg_price: Decimal = Decimal("0")
+        self.grid_step: Decimal = Decimal(str(grid_step))
+
     def update_position(self, order: OrderData):
         if order.status != Status.ALLTRADED:
             return
@@ -62,11 +63,11 @@ class GridPositionCalculator(object):
         if order.direction == Direction.LONG:
             self.pos += order.volume
 
-            if self.pos == 0:
-                self.avg_price = 0
+            if self.pos == Decimal("0"):
+                self.avg_price = Decimal("0")
             else:
 
-                if previous_pos == 0:
+                if previous_pos == Decimal("0"):
                     self.avg_price = order.price
 
                 elif previous_pos > 0:
@@ -83,11 +84,11 @@ class GridPositionCalculator(object):
         elif order.direction == Direction.SHORT:
             self.pos -= order.volume
 
-            if self.pos == 0:
-                self.avg_price = 0
+            if self.pos == Decimal("0"):
+                self.avg_price = Decimal("0")
             else:
 
-                if previous_pos == 0:
+                if previous_pos == Decimal("0"):
                     self.avg_price = order.price
 
                 elif previous_pos < 0:
@@ -100,6 +101,5 @@ class GridPositionCalculator(object):
 
                 elif previous_pos > 0 > self.pos:
                     self.avg_price = order.price
-
 
 ```
