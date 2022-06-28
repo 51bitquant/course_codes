@@ -30,7 +30,7 @@ https://github.com/51bitquant/howtrader/blob/main/howtrader/app/cta_strategy/str
 
 ### 2. 更新软件
 
-> pip install git+https://github.com/51bitquant/howtrader -U
+> pip install git+https://github.com/51bitquant/howtrader.git -U
 
 更新到当前的最新版本: 2.1.8.0 版本 
 
