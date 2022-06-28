@@ -14,14 +14,14 @@
 
 ## conda创建虚拟环境:
 在终端termial, window在cmd命令行中输入 
-> conda create -n <你的环境的名称> python=3.7 # 输入英文拼音，不要带<>
-
-> conda create -n study
+> conda create -n your_interpreter_name python=3.9 # 
+ 
+例如创建名为study的解析器 
+> conda create -n study python=3.9
 
 ## conda激活安装环境
-> conda activate <你的环境名称> # <> 表示变量
+> conda activate study 
 
-> conda activate study
 ## 查看环境列表
 > conda env list 
 
