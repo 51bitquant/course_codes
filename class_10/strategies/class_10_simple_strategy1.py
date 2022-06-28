@@ -1,19 +1,14 @@
 from howtrader.app.cta_strategy import (
     CtaTemplate,
-    StopOrder,
-    TickData,
-    BarData,
-    TradeData,
-    OrderData,
-    BarGenerator,
-    ArrayManager
+    StopOrder
 )
 
-from howtrader.trader.constant import Interval
+from howtrader.trader.object import TickData, BarData, TradeData, OrderData, Interval
+
+from howtrader.trader.utility import BarGenerator, ArrayManager
 from datetime import datetime
-from howtrader.app.cta_strategy.engine import CtaEngine, EngineType
-import pandas_ta as ta
-import pandas as pd
+from howtrader.app.cta_strategy.engine import CtaEngine
+from decimal import Decimal
 
 
 class Class10SimpleStrategy1(CtaTemplate):
@@ -23,12 +18,10 @@ class Class10SimpleStrategy1(CtaTemplate):
         """"""
         super().__init__(cta_engine, strategy_name, vt_symbol, setting)
 
-        # self.bg2 = BarGenerator(self.on_bar, 2, self.on_2min_bar, Interval.MINUTE)
-        #
-        # self.bg3 = BarGenerator(self.on_bar, 3, self.on_3min_bar, Interval.MINUTE)
-        #
-        # self.bg5 = BarGenerator(self.on_bar, 5, self.on_5min_bar, Interval.MINUTE)
-        #
+        self.bg2 = BarGenerator(self.on_bar, 2, self.on_2min_bar, Interval.MINUTE)
+        self.bg3 = BarGenerator(self.on_bar, 3, self.on_3min_bar, Interval.MINUTE)
+        self.bg5 = BarGenerator(self.on_bar, 5, self.on_5min_bar, Interval.MINUTE)
+
         # self.am3 = ArrayManager()  # 3分钟的时间序列.
         # # 如果想获取其他周期的K线数据
         # self.bg_1hour = BarGenerator(self.on_bar, 1, self.on_1hour_bar, Interval.HOUR)  # 1小时的K线.
@@ -79,23 +72,26 @@ class Class10SimpleStrategy1(CtaTemplate):
         print(f"my current pos is: {self.pos}, ask:{tick.ask_price_1}, bid: {tick.bid_price_1}")
 
         if self.place_order is False and self.trading:
-            buy_order = self.buy(tick.bid_price_1 * 0.99, 0.5)
+            buy_order = self.buy(Decimal(tick.bid_price_1 * 0.99), Decimal("0.5"))
             # sell_order = self.short(tick.ask_price_1 * 1.0001, 0.01)
-            sell_order = self.sell(tick.ask_price_1 * 1.01, 0.5)
+            sell_order = self.sell(Decimal(tick.ask_price_1 * 1.01), Decimal("0.5"))
             self.place_order = True
             print(f"buy_order: {buy_order}, sell_order: {sell_order}")
             self.orders += buy_order
-            # self.orders += sell_order
+            self.orders += sell_order
+
+        self.bg2.update_tick(tick)
+        self.bg3.update_tick(tick)
+        self.bg5.update_tick(tick)
 
     def on_bar(self, bar: BarData):
         """
         Callback of new bar data update.
         """
         print("一分钟的K线数据", bar)
-        # self.bg2.update_bar(bar)
-        # self.bg3.update_bar(bar)
-        # self.bg5.update_bar(bar)
-        # self.bg_1hour.update_bar(bar)
+        self.bg2.update_bar(bar)
+        self.bg3.update_bar(bar)
+        self.bg5.update_bar(bar)
         self.put_event()
 
 
