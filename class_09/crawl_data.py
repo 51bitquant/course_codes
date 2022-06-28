@@ -35,7 +35,7 @@ def generate_datetime(timestamp: float) -> datetime:
     return dt
 
 
-def get_binance_data(symbol: str, exchanges: str, start_time: str, end_time: str, gateway:str):
+def get_binance_data(symbol: str, exchanges: str, start_time: str, end_time: str):
     """
     爬取币安交易所的数据
     :param symbol: BTCUSDT.
@@ -53,16 +53,19 @@ def get_binance_data(symbol: str, exchanges: str, start_time: str, end_time: str
         print("spot")
         limit = BINANCE_SPOT_LIMIT
         save_symbol = symbol.lower()
+        gateway = "BINANCE_SPOT"
         api_url = f'https://api.binance.com/api/v3/klines?symbol={symbol}&interval=1m&limit={limit}'
 
     elif exchanges == 'usdt_future':
         print('usdt_future')
         limit = BINANCE_FUTURE_LIMIT
+        gateway = "BINANCE_USDT"
         api_url = f'https://fapi.binance.com/fapi/v1/klines?symbol={symbol}&interval=1m&limit={limit}'
 
     elif exchanges == 'inverse_future':
         print("inverse_future")
         limit = BINANCE_FUTURE_LIMIT
+        gateway = "BINANCE_INVERSE"
         f'https://dapi.binance.com/dapi/v1/klines?symbol={symbol}&interval=1m&limit={limit}'
 
     else:
@@ -129,14 +132,14 @@ def get_binance_data(symbol: str, exchanges: str, start_time: str, end_time: str
             time.sleep(10)
 
 
-def download_spot(symbol,gateway="BINANCE_SPOT"):
+def download_spot(symbol):
     """
     下载现货数据的方法.
     :return:
     """
-    t1 = Thread(target=get_binance_data, args=(symbol, 'spot', "2018-1-1", "2019-1-1", gateway))
-    t2 = Thread(target=get_binance_data, args=(symbol, 'spot', "2019-1-1", "2020-1-1", gateway))
-    t3 = Thread(target=get_binance_data, args=(symbol, 'spot', "2020-1-1", "2020-12-1", gateway))
+    t1 = Thread(target=get_binance_data, args=(symbol, 'spot', "2018-1-1", "2019-1-1"))
+    t2 = Thread(target=get_binance_data, args=(symbol, 'spot', "2019-1-1", "2020-1-1"))
+    t3 = Thread(target=get_binance_data, args=(symbol, 'spot', "2020-1-1", "2020-12-1"))
 
     t1.start()
     t2.start()
@@ -147,26 +150,26 @@ def download_spot(symbol,gateway="BINANCE_SPOT"):
     t3.join()
 
 
-def download_future(symbol, gateway="BINANCE_USDT"):
+def download_future(symbol):
     """
     下载合约数据的方法。
     :return:
     """
 
     # BTCUSDT的， 要注意看该币的上市时间。
-    t1 = Thread(target=get_binance_data, args=(symbol, 'future', "2019-9-10", "2020-2-1", gateway))
-    t2 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-2-1", "2020-7-1", gateway))
-    t3 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-7-1", "2020-12-1", gateway))
+    t1 = Thread(target=get_binance_data, args=(symbol, 'future', "2019-9-10", "2020-2-1"))
+    t2 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-2-1", "2020-7-1"))
+    t3 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-7-1", "2020-12-1"))
 
     # ETHUSDT
-    # t1 = Thread(target=get_binance_data, args=(symbol, 'future', "2019-11-30", "2020-4-1", gateway))
-    # t2 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-4-1", "2020-8-1", gateway))
-    # t3 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-8-1", "2020-12-1", gateway))
+    # t1 = Thread(target=get_binance_data, args=(symbol, 'future', "2019-11-30", "2020-4-1"))
+    # t2 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-4-1", "2020-8-1"))
+    # t3 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-8-1", "2020-12-1"))
 
     # BNBUSDT
-    # t1 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-02-11", "2020-5-1", gateway))
-    # t2 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-5-1", "2020-9-1", gateway))
-    # t3 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-9-1", "2020-12-1", gateway))
+    # t1 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-02-11", "2020-5-1"))
+    # t2 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-5-1", "2020-9-1"))
+    # t3 = Thread(target=get_binance_data, args=(symbol, 'future', "2020-9-1", "2020-12-1"))
 
     t1.start()
     t2.start()
