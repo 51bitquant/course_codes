@@ -5,14 +5,14 @@
 
 2. 更新方法: 在终端输入一下命令: 
 
-> pip install git+https://github.com/ramoslin02/howtrader -U
+> pip install git+https://github.com/51bitquant/howtrader.git -U
 
 或者先卸载然后再安装
 > pip uninstall howtrader 
 
-> pip install git+https://github.com/ramoslin02/howtrader
+> pip install git+https://github.com/51bitquant/howtrader.git
    
-3. 课程代码和课件下载地址: https://github.com/ramoslin02/course_codes
+3. 课程代码和课件下载地址: https://github.com/51bitquant/course_codes
 
 ## 系统的内置的策略
 在框架howtrader.app.cta_strategy.strategies目录下

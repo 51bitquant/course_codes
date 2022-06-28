@@ -8,8 +8,7 @@ from howtrader.trader.setting import SETTINGS
 from howtrader.trader.engine import MainEngine
 from howtrader.app.cta_strategy.engine import CtaEngine
 
-from howtrader.gateway.binances import BinancesGateway
-from howtrader.gateway.binance import BinanceGateway
+from howtrader.gateway.binance import BinanceSpotGateway, BinanceUsdtGateway, BinanceInverseGateway
 from howtrader.app.cta_strategy import CtaStrategyApp
 from howtrader.app.cta_strategy.base import EVENT_CTA_LOG
 
@@ -17,10 +16,9 @@ SETTINGS["log.active"] = True  #
 SETTINGS["log.level"] = INFO
 SETTINGS["log.console"] = True  # 打印信息到终端.
 
-binance_settings = {
+gateway_settings = {
     "key": "xx",
     "secret": "xxx",
-    "session_number": 3,
     "proxy_host": "127.0.0.1",
     "proxy_port": 1087
 }
@@ -32,7 +30,7 @@ if __name__ == "__main__":
 
     event_engine = EventEngine()  # 初始化事件引擎
     main_engine = MainEngine(event_engine)  # 初始化主引擎
-    main_engine.add_gateway(BinanceGateway)  # 添加cta策略的app
+    main_engine.add_gateway(BinanceUsdtGateway)  # 添加cta策略的app
 
 
     cta_engine: CtaEngine = main_engine.add_app(CtaStrategyApp)
@@ -44,7 +42,7 @@ if __name__ == "__main__":
     event_engine.register(EVENT_CTA_LOG, log_engine.process_log_event)
     main_engine.write_log("注册日志事件监听")
 
-    main_engine.connect(binance_settings, "BINANCE")
+    main_engine.connect(gateway_settings, "BINANCE_USDT")
     main_engine.write_log("连接BINANCE接口")
 
     sleep(10)  # 稍作等待策略启动完成。

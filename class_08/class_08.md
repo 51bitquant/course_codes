@@ -8,15 +8,15 @@
 
 
 ## 答疑: 安装vnpy的错误
-1. MacOS系统，要记得安装Xcode开发工具，主要是Xcode会帮你把一些构建工具和库安装好。
-2. 安装通过pip install git+https://github.com/ramoslin02/howtrader.git
+1. MacOS系统，要记得安装Xcode开发工具，主要是Xcode会帮你把一些构建工具和库安装好,
+   window系统不需要安装Xcode开发工具，因为没有这个软件。
+2. 安装通过pip install git+https://github.com/51bitquant/howtrader.git
 3. 如果没有安装git工具的，记得去安装，具体百度下。
-4. 如果出现一些get_localzone的问题，是因为系统时区的问题。具体可以百度学习下。
 
 ## 支持的数据库类型
 1. 支持sqlite3数据库(默认使用)
 2. mongodb数据库
-3. mysql  
+3. mysql
 
 ## 配置文件
 
@@ -102,7 +102,7 @@ SETTINGS: Dict[str, Any] = {
 使用mongodb的配置
 ``` json
 {
-     "database.driver": "mongodb",               
+    "database.driver": "mongodb",               
     "database.database": "howtrader",
     "database.host": "localhost",
     "database.port": 27017,

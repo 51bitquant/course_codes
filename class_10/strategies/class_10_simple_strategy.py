@@ -1,20 +1,13 @@
 from howtrader.app.cta_strategy import (
     CtaTemplate,
-    StopOrder,
-    TickData,
-    BarData,
-    TradeData,
-    OrderData,
-    BarGenerator,
-    ArrayManager
+    StopOrder
 )
 
+from howtrader.trader.object import TickData, BarData, TradeData, OrderData
 from howtrader.trader.constant import Interval
-from datetime import datetime
 from howtrader.app.cta_strategy.engine import CtaEngine, EngineType
-import pandas_ta as ta
-import pandas as pd
-
+from howtrader.trader.utility import BarGenerator
+from decimal import Decimal
 
 class Class10SimpleStrategy(CtaTemplate):
     author = "51bitquant"
@@ -55,13 +48,14 @@ class Class10SimpleStrategy(CtaTemplate):
 
 
     def on_tick(self, tick: TickData):
+
         print(f"tick, ask1:{tick.ask_price_1}, {tick.ask_volume_1}, bid:{tick.bid_price_1}, {tick.bid_volume_1}")
         print(f"my current pos is: {self.pos}, ask:{tick.ask_price_1}, bid: {tick.bid_price_1}")
 
         if self.place_order is False and self.trading:
-            buy_order = self.buy(tick.bid_price_1 * 0.9999, 0.5)
+            buy_order = self.buy(Decimal(tick.bid_price_1 * 0.9999), Decimal("0.5"))
             # sell_order = self.short(tick.ask_price_1 * 1.0001, 0.01)
-            sell_order = self.sell(tick.ask_price_1 * 1.0002, 0.5)
+            sell_order = self.sell(Decimal(tick.ask_price_1 * 1.0002), Decimal("0.5"))
 
             # self.short()
             # self.cover()  #
@@ -70,8 +64,12 @@ class Class10SimpleStrategy(CtaTemplate):
             # self.short()
             self.place_order = True
             print(f"buy_order: {buy_order}, sell_order: {sell_order}")
-            self.orders += buy_order
-            self.orders += sell_order
+            self.orders.extend(buy_order)
+            self.orders.extend(sell_order)
+
+        self.bg2.update_tick(tick)
+        self.bg5.update_tick(tick)
+        self.bg_1hour.update_tick(tick)
 
     def on_bar(self, bar: BarData):
         """
