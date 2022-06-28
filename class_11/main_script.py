@@ -8,8 +8,8 @@ from howtrader.trader.setting import SETTINGS
 from howtrader.trader.engine import MainEngine
 from howtrader.app.cta_strategy.engine import CtaEngine
 
-from howtrader.gateway.binances import BinancesGateway
-from howtrader.gateway.binance import BinanceGateway
+from howtrader.gateway.binance import BinanceSpotGateway
+from howtrader.gateway.binance import BinanceUsdtGateway
 from howtrader.app.cta_strategy import CtaStrategyApp
 from howtrader.app.cta_strategy.base import EVENT_CTA_LOG
 
@@ -18,23 +18,13 @@ SETTINGS["log.level"] = INFO
 SETTINGS["log.console"] = True  # 打印信息到终端.
 
 # 现货的
-binance_settings = {
+gateway_settings = {
     "key": "xxx",
     "secret": "xxx",
-    "session_number": 3,
     "proxy_host": "",
     "proxy_port": 0
 }
 
-binances_settings = {
-    "key": "xxx",
-    "secret": "xxx",
-    "会话数": 3,
-    "服务器": "REAL",
-    "合约模式": "正向",
-    "代理地址": "",
-    "代理端口": 0
-}
 
 if __name__ == "__main__":
 
@@ -42,8 +32,8 @@ if __name__ == "__main__":
 
     event_engine = EventEngine()  # 初始化事件引擎
     main_engine = MainEngine(event_engine)  # 初始化主引擎
-    main_engine.add_gateway(BinanceGateway)  #  加载币安现货的网关
-    main_engine.add_gateway(BinancesGateway)  # 加载币安合约的网关
+    main_engine.add_gateway(BinanceSpotGateway)  #  加载币安现货的网关
+    main_engine.add_gateway(BinanceUsdtGateway)  # 加载币安合约的网关
 
     cta_engine: CtaEngine = main_engine.add_app(CtaStrategyApp)  #添加cta策略的app
     # 添加cta引擎, 实际上就是初始化引擎。
@@ -56,11 +46,11 @@ if __name__ == "__main__":
     main_engine.write_log("注册日志事件监听")
 
     # 连接到交易所
-    main_engine.connect(binance_settings, "BINANCE")
-    main_engine.write_log("连接BINANCE接口")
+    main_engine.connect(gateway_settings, "BINANCE_SPOT")
+    main_engine.write_log("connect binance spot gateway")
 
-    # main_engine.connect(binances_settings, "BINANCES")
-    # main_engine.write_log("连接BINANCE合约接口")
+    main_engine.connect(gateway_settings, "BINANCE_USDT")
+    main_engine.write_log("connect binance usdt future gateway")
 
     sleep(20)  # 稍作等待策略启动完成。
 
