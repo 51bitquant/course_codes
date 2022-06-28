@@ -14,9 +14,9 @@
 
 ### 2. 更新软件
 
-> pip install git+https://github.com/51bitquant/howtrader -U
+> pip install git+https://github.com/51bitquant/howtrader.git -U
 
-更新到当前的最新版本: 2.1.8.0 版本 
+更新到当前的最新版本: 3.0 版本 
 
 
 ### 3. 能访问交易所或者购买一个服务器
