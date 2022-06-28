@@ -1,6 +1,5 @@
-from howtrader.gateway.binance.binance_gateway import BinanceGateway
-
-from howtrader.gateway.binances.binances_gateway import BinancesGateway
+from howtrader.gateway.binance import BinanceUsdtGateway
+from howtrader.gateway.binance import BinanceSpotGateway
 from howtrader.event.engine import  EventEngine, Event, EVENT_TIMER
 
 from howtrader.trader.constant import Status, OrderType
