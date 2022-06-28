@@ -10,7 +10,7 @@ if __name__ == '__main__':
         vt_symbol="btcusdt.BINANCE",  # 现货的数据
         interval=Interval.MINUTE,
         start=datetime(2018,1,1),
-        end=datetime(2020,12,1),
+        end=datetime(2018,6,1),
         rate=1/1000,  # 币安手续费千分之1， BNB 万7.5  7.5/10000
         slippage=0,
         size=1,  # 币本位合约 100

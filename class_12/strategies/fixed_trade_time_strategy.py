@@ -1,19 +1,13 @@
 from howtrader.app.cta_strategy import (
     CtaTemplate,
-    StopOrder,
-    TickData,
-    BarData,
-    TradeData,
-    OrderData,
-    BarGenerator,
-    ArrayManager
+    StopOrder
 )
 
+from howtrader.trader.object import TickData, BarData, TradeData, OrderData
+from howtrader.trader.utility import BarGenerator, ArrayManager
 from howtrader.trader.constant import Interval
-from datetime import datetime
-from howtrader.app.cta_strategy.engine import CtaEngine, EngineType
-import pandas_ta as ta
-import pandas as pd
+from howtrader.app.cta_strategy.engine import CtaEngine
+from decimal import Decimal
 
 
 class FixedTradeTimeStrategy(CtaTemplate):
@@ -56,7 +50,7 @@ class FixedTradeTimeStrategy(CtaTemplate):
         self.put_event()
 
     def on_tick(self, tick: TickData):
-        pass
+        self.bg_1hour.update_tick(tick)
 
     def on_bar(self, bar: BarData):
         """
@@ -80,11 +74,11 @@ class FixedTradeTimeStrategy(CtaTemplate):
         # 2000 * 54  # 10万美金，
         if bar.datetime.isoweekday() == 5 and bar.datetime.hour == 16:
             price = bar.close_price * 1.001
-            self.buy(price, self.fixed_trade_money/price)
+            self.buy(Decimal(price), Decimal(self.fixed_trade_money/price))
 
         if bar.datetime.isoweekday() == 4 and bar.datetime.hour == 15:
             price = bar.close_price * 1.001
-            self.buy(price, self.fixed_trade_money / price)
+            self.buy(Decimal(price), Decimal(self.fixed_trade_money / price))
 
 
         # 下面可以计算基数指标等等....

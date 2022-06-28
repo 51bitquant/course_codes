@@ -1,20 +1,13 @@
 from howtrader.app.cta_strategy import (
     CtaTemplate,
-    StopOrder,
-    TickData,
-    BarData,
-    TradeData,
-    OrderData,
-    BarGenerator,
-    ArrayManager
+    StopOrder
 )
 
+from howtrader.trader.object import TickData, BarData, TradeData, OrderData
 from howtrader.trader.constant import Interval
-from datetime import datetime
-from howtrader.app.cta_strategy.engine import CtaEngine, EngineType
-import pandas_ta as ta
-import pandas as pd
-
+from howtrader.trader.utility import BarGenerator, ArrayManager
+from howtrader.app.cta_strategy.engine import CtaEngine
+from decimal import Decimal
 
 class FixedTradPriceStrategy(CtaTemplate):
     """
@@ -56,7 +49,7 @@ class FixedTradPriceStrategy(CtaTemplate):
 
 
     def on_tick(self, tick: TickData):
-        pass
+        self.bg_4hour.update_tick(tick)
 
     def on_bar(self, bar: BarData):
         """
@@ -84,7 +77,7 @@ class FixedTradPriceStrategy(CtaTemplate):
         # 如果四小时价格下跌5%就买入.
         if (last_close_price - current_close_price)/last_close_price >= self.price_change_pct:
             price = bar.close_price * 1.001
-            self.buy(price, self.fixed_trade_money/price)
+            self.buy(Decimal(price), Decimal(self.fixed_trade_money/price))
 
         self.put_event()
 
