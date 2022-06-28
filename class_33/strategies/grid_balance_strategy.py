@@ -1,32 +1,17 @@
 from howtrader.app.cta_strategy import (
     CtaTemplate,
-    StopOrder,
-    TickData,
-    BarData,
-    TradeData,
-    OrderData,
-    BarGenerator,
-    ArrayManager
+    StopOrder
 )
 
+from howtrader.trader.object import TickData, BarData, TradeData, OrderData, Offset
 from howtrader.trader.event import (
-    EVENT_TICK,
-    EVENT_BAR,
-    EVENT_ORDER,
-    EVENT_TRADE,
-    EVENT_POSITION,
     EVENT_ACCOUNT
 )
 
 from howtrader.event import Event
 
-
-from howtrader.trader.constant import Interval
-from datetime import datetime
 from howtrader.app.cta_strategy.engine import CtaEngine, EngineType
-import pandas_ta as ta
-import pandas as pd
-
+from decimal import Decimal
 
 class GridBalanceStrategy(CtaTemplate):
 
@@ -83,14 +68,14 @@ class GridBalanceStrategy(CtaTemplate):
         if self.my_balance <= 0:
             return
 
-        if (abs(self.my_balance - self.pos * price) / self.my_balance) >= self.balance_diff_pct:
+        if (abs(self.my_balance - float(self.pos) * price) / self.my_balance) >= self.balance_diff_pct:
 
-            balance_diff = abs(self.my_balance - self.pos * price) / 2
+            balance_diff = abs(self.my_balance - float(self.pos) * price) / 2
             # print('需要进行资金平衡.', balance_diff, self.my_balance, self.pos, price)
-            if self.my_balance > self.pos * price:
-                self.buy(price*1.001, balance_diff/price)
+            if self.my_balance > float(self.pos) * price:
+                self.buy(Decimal(price*1.001), Decimal(balance_diff/price))
             else:
-                self.sell(price * 0.999, balance_diff / price)
+                self.sell(Decimal(price * 0.999), Decimal(balance_diff / price))
 
         self.put_event()
 
@@ -112,11 +97,11 @@ class GridBalanceStrategy(CtaTemplate):
         系统通过里面处理这个方法，知道你当前的仓位数量
 
         """
-        from howtrader.trader.object import Offset
+
         if trade.offset == Offset.OPEN:
-            self.my_balance -= trade.price * trade.volume
+            self.my_balance -= float(trade.price) * float(trade.volume)
         elif trade.offset == Offset.CLOSE:
-            self.my_balance += trade.price * trade.volume
+            self.my_balance += float(trade.price) * float(trade.volume)
 
         self.put_event()  # 更新UI界面方法。
 

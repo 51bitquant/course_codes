@@ -1,13 +1,7 @@
 from howtrader.app.cta_strategy.backtesting import BacktestingEngine
 from howtrader.trader.object import Interval
 from datetime import datetime
-from strategies.my_dual import MyDualWithNDays
-from strategies.dual_kdj import MyDualKDJ
 
-from howtrader.app.cta_strategy.backtesting import OptimizationSetting
-from strategies.grid_balance_strategy import GridBalanceStrategy
-from strategies.martingle_spot_strategyV2 import MartingleSpotStrategyV2
-from strategies.martingle_spot_strategy import MartingleSpotStrategy
 from strategies.martingle_spot_strategyV3 import MartingleSpotStrategyV3
 
 if __name__ == '__main__':
@@ -17,7 +11,7 @@ if __name__ == '__main__':
         vt_symbol="btcusdt.BINANCE",  # 现货的数据
         interval=Interval.MINUTE,
         start=datetime(2018,1,11),
-        end=datetime(2020, 12, 1),
+        end=datetime(2018, 5, 1),
         # end=datetime(2020,12,1),
         rate=7.5/10000,  # 币安手续费千分之1， BNB 万7.5  7.5/10000
         slippage=0,
