@@ -3,8 +3,7 @@ from howtrader.event import EventEngine
 from howtrader.trader.engine import MainEngine
 from howtrader.trader.ui import MainWindow, create_qapp
 
-from howtrader.gateway.binance import BinanceGateway  #现货
-from howtrader.gateway.binances import BinancesGateway  # 合约
+from howtrader.gateway.binance import BinanceSpotGateway, BinanceUsdtGateway
 
 from howtrader.app.cta_strategy import CtaStrategyApp  # CTA策略
 from howtrader.app.data_manager import DataManagerApp  # 数据管理, csv_data
@@ -24,8 +23,8 @@ def main():
 
     main_engine = MainEngine(event_engine)
 
-    main_engine.add_gateway(BinanceGateway)
-    main_engine.add_gateway(BinancesGateway)
+    main_engine.add_gateway(BinanceSpotGateway)  # spot gateway
+    main_engine.add_gateway(BinanceUsdtGateway)  # usdt_future gateway
     main_engine.add_app(CtaStrategyApp)
     main_engine.add_app(CtaBacktesterApp)
     main_engine.add_app(DataManagerApp)

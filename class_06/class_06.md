@@ -1,15 +1,19 @@
 # 第六课: VNPY量化交易软件的安装, 图形界面的启动和功能介绍
-软件代码地址: **https://github.com/ramoslin02/howtrader.git**
+软件代码地址: **https://github.com/51bitquant/howtrader**
 
 ## step 1 创建一个新的虚拟环境并激活
+更新anaconda, 如果你切换到其他解析器了，可以通过执行conda deactivate,
+然后再执行下面的命令。
 
-> conda create -n mytrader python=3.7
+> conda update conda
+
+> conda create -n mytrader python==3.9
 
 > conda activate mytrader
 
 ## step 2 安装howtrader
 
-> pip install git+https://github.com/ramoslin02/howtrader.git
+> pip install git+https://github.com/51bitquant/howtrader.git
 
 ## step 3 创建howtrader文件夹
 
@@ -24,8 +28,7 @@ from howtrader.event import EventEngine
 from howtrader.trader.engine import MainEngine
 from howtrader.trader.ui import MainWindow, create_qapp
 
-from howtrader.gateway.binance import BinanceGateway
-from howtrader.gateway.binances import BinancesGateway
+from howtrader.gateway.binance import BinanceUsdtGateway, BinanceSpotGateway
 
 
 from howtrader.app.cta_strategy import CtaStrategyApp
@@ -45,8 +48,8 @@ def main():
 
     main_engine = MainEngine(event_engine)
 
-    main_engine.add_gateway(BinanceGateway)
-    main_engine.add_gateway(BinancesGateway)
+    main_engine.add_gateway(BinanceUsdtGateway)
+    main_engine.add_gateway(BinanceSpotGateway)
     main_engine.add_app(CtaStrategyApp)
     main_engine.add_app(CtaBacktesterApp)
     main_engine.add_app(DataManagerApp)
