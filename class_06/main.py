@@ -9,7 +9,6 @@ from howtrader.app.cta_strategy import CtaStrategyApp  # CTA策略
 from howtrader.app.data_manager import DataManagerApp  # 数据管理, csv_data
 from howtrader.app.data_recorder import DataRecorderApp  # 录行情数据
 from howtrader.app.algo_trading import AlgoTradingApp  # 算法交易
-from howtrader.app.cta_backtester import CtaBacktesterApp  # 回测研究
 from howtrader.app.risk_manager import RiskManagerApp  # 风控管理
 from howtrader.app.spread_trading import SpreadTradingApp  # 价差交易
 
@@ -26,7 +25,6 @@ def main():
     main_engine.add_gateway(BinanceSpotGateway)  # spot gateway
     main_engine.add_gateway(BinanceUsdtGateway)  # usdt_future gateway
     main_engine.add_app(CtaStrategyApp)
-    main_engine.add_app(CtaBacktesterApp)
     main_engine.add_app(DataManagerApp)
     main_engine.add_app(AlgoTradingApp)
     main_engine.add_app(DataRecorderApp)
